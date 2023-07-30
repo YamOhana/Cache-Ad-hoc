@@ -1,5 +1,6 @@
 const CachedObject = require('../models/cachedObject');
 const logger = require('../logger');
+const simulateTimeConsumingTask = require('../utils');
 
 exports.batchCacheRefresh = async (req, res) => {
   try {
@@ -19,7 +20,7 @@ exports.batchCacheRefresh = async (req, res) => {
       logger.info(`Cache refresh completed for object ID: ${cachedObject.ID}`);
 
       cachedObject.lastUpdateDate = new Date();
-      cachedObject.cachedData = 'Sample updated cached data'; 
+      cachedObject.cachedData = 'Sample updated cached data';
       cachedObject.requestType = 'batch';
 
       await cachedObject.save();
@@ -33,11 +34,4 @@ exports.batchCacheRefresh = async (req, res) => {
 
     res.status(500).json({ error: 'An error occurred during batch cache refresh.' });
   }
-};
-
-const simulateTimeConsumingTask = () => {
-  return new Promise((resolve) => {
-    logger.info('Simulating time-consuming batch cache refresh task...');
-    setTimeout(resolve, 3000); 
-  });
 };
