@@ -1,28 +1,28 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-// const adHocRoutes = require('./routes/adHocRoutes');
-// const batchRoutes = require('./routes/batchRoutes');
-// const adHocController = require('./controllers/adHocController');
-// const batchController = require('./controllers/batchController');
+const bodyParser = require('body-parser');
+const routes = require('./routes');
+const logger = require('./logger');
+
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  logger.info('Connected to MongoDB');
+});
 
 const app = express();
-const port = 3000;
 
-// Connect to MongoDB Atlas
-console.log(`connecting to ${process.env.MONGO_URL}`);
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => {
-    console.log('Connected to MongoDB Atlas');
-  })
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
+app.use(bodyParser.json());
+app.use('/api', routes);
 
-// app.use('/', adHocRoutes);
-// app.use('/', batchRoutes);
+app.use((err, req, res, next) => {
+  logger.error('Error:', err);
+  res.status(500).json({ success: false, message: 'Internal Server Error' });
+});
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+const PORT = 3000;
+app.listen(PORT, () => {
+  logger.info(`Server is running on port ${PORT}`);
 });

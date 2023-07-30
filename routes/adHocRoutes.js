@@ -1,19 +1,24 @@
 const express = require('express');
-const router = express.Router();
 const adHocController = require('../controllers/adHocController');
-const logger = require('../logger'); 
+const logger = require('../logger');
 
-router.post('/cache/refresh/:objectId', async (req, res) => {
-  const { objectId } = req.params;
+const router = express.Router();
 
-  logger.info('Ad-hoc cache refresh request received for object ID:', objectId);
-
+router.post('/refresh/:objectId', async (req, res) => {
   try {
-    const result = await adHocController.adHocCacheRefresh(objectId);
-    return res.status(200).json({ success: true, result });
+    const { objectId } = req.params;
+
+    logger.info(`Ad-hoc cache refresh request received for object ID: ${ objectId }` );
+
+    await adHocController.adHocCacheRefresh(objectId);
+
+    logger.info(`Ad-hoc cache refresh completed for object ID: ${ objectId }` );
+
+    res.json({ message: 'Ad-hoc cache refresh completed successfully.' });
   } catch (err) {
-    logger.error('Error in adHocCacheRefresh route:', err);
-    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+    logger.error(`Error in adHocCacheRefresh: ${ err.message, err.stack }`);
+
+    res.status(500).json({ error: 'An error occurred during ad-hoc cache refresh.' });
   }
 });
 
