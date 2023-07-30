@@ -5,12 +5,13 @@ const bodyParser = require('body-parser');
 const routes = require('./routes');
 const logger = require('./logger');
 
-mongoose.connect(process.env.MONGO_URL, {
+mongoose.connect(process.env.MONGO_URL
+  , {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => {
-  logger.info('Connected to MongoDB');
-});
+})
+  .then(() => console.log('Connected to MongoDB locally'))
+  .catch(err => console.error('Error connecting to MongoDB:', err));
 
 const app = express();
 
