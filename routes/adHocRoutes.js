@@ -1,6 +1,6 @@
 const express = require('express');
 const adHocController = require('../controllers/adHocController');
-const logger = require('../logger');
+const logger = require('../config/logger');
 
 const router = express.Router();
 
