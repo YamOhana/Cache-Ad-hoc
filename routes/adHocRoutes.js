@@ -8,7 +8,6 @@ router.post('/refresh/:objectId', async (req, res) => {
   try {
     const { objectId } = req.params;
 
-    logger.info(`Ad-hoc cache refresh request received for object ID: ${ objectId }` );
 
     await adHocController.adHocCacheRefresh(objectId);
 

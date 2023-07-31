@@ -1,43 +1,32 @@
-const amqp = require('amqplib');
-const logger = require('../config/logger');
+const setupRabbitMQ = require('../config/rabbitmqConfig');
 
-const rabbitmqUrl = process.env.RABBITMQ_URL;
-const exchangeName = 'cache_refresh_exchange';
-const adHocQueueName = 'adhoc_cache_refresh_queue';
-const batchQueueName = 'batch_cache_refresh_queue';
+let channel;
 
-const connectRabbitMQ = async () => {
-  try {
-    const connection = await amqp.connect(rabbitmqUrl);
-    const channel = await connection.createChannel();
-
-    await channel.assertExchange(exchangeName, 'direct', { durable: true });
-    await channel.assertQueue(adHocQueueName, { durable: true });
-    await channel.assertQueue(batchQueueName, { durable: true });
-
-    await channel.bindQueue(adHocQueueName, exchangeName, 'adHoc');
-    await channel.bindQueue(batchQueueName, exchangeName, 'batch');
-
-    return channel;
-  } catch (error) {
-    logger.error('Error connecting to RabbitMQ:', error);
-    throw error;
+const initializeChannel = async () => {
+  if (!channel) {
+    channel = await setupRabbitMQ();
   }
 };
 
-const sendMessage = async (queueType, message) => {
+exports.sendMessage = async (queueType, message) => {
   try {
-    const channel = await connectRabbitMQ();
-    const queueName = queueType === 'adHoc' ? adHocQueueName : batchQueueName;
-    const messageBuffer = Buffer.from(JSON.stringify(message));
+    await initializeChannel();
 
-    channel.sendToQueue(queueName, messageBuffer, { persistent: true });
-
-    logger.info(`Message sent to RabbitMQ ${queueType} queue:`, message);
+    if (queueType === 'adHoc') {
+      const adHocExchangeName = 'adHocExchange';
+      const adHocRoutingKey = 'adHoc';
+      const adHocMessageBuffer = Buffer.from(JSON.stringify(message));
+      await channel.publish(adHocExchangeName, adHocRoutingKey, adHocMessageBuffer, { persistent: true });
+      console.log('Message sent to ad-hoc exchange with routing key "adHoc"');
+    } else if (queueType === 'batch') {
+      const batchQueueName = 'batchQueue';
+      const batchMessageBuffer = Buffer.from(JSON.stringify(message));
+      await channel.sendToQueue(batchQueueName, batchMessageBuffer, { persistent: true });
+      console.log('Message sent to batch queue');
+    } else {
+      console.error('Invalid queue type:', queueType);
+    }
   } catch (error) {
-    logger.error(`Error sending message to RabbitMQ ${queueType} queue:`, error);
-    throw error;
+    console.error('Error sending message to RabbitMQ:', error);
   }
 };
-
-module.exports = { sendMessage };

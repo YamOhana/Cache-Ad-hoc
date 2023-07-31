@@ -1,29 +1,43 @@
+const amqp = require('amqplib');
 const CachedObject = require('../models/cachedObject');
 const logger = require('../config/logger');
 
 const handleBatchCacheRefresh = async (criteria) => {
-    try {
-        logger.info('Handling batch cache refresh with criteria:', criteria);
+  try {
+    logger.info('Handling batch cache refresh with criteria:', criteria);
 
-        const cachedObjectsToUpdate = await CachedObject.find(criteria);
+    // Perform your batch cache refresh logic here...
+    // action example
+    const updatedData = 'Sample updated cached data for batch';
+    await CachedObject.updateMany(criteria, { cachedData: updatedData, requestType: 'batch' });
 
-        for (const cachedObject of cachedObjectsToUpdate) {
-            logger.info('Starting cache refresh for object ID:', cachedObject.ID);
-
-            // action example
-            await cachedObject.updateOne({
-                cachedData: 'Sample updated cached data',
-                requestType: 'batch',
-                lastUpdateDate: new Date(),
-            });
-
-            logger.info('Cache refresh request sent for object ID:', cachedObject.ID);
-        }
-
-        logger.info('Batch cache refresh completed.');
-    } catch (error) {
-        logger.error('Error in batch cache refresh:', error);
-    }
+    logger.info('Batch cache refresh completed with criteria:', criteria);
+  } catch (error) {
+    logger.error('Error in batch cache refresh:', error);
+  }
 };
 
-module.exports = handleBatchCacheRefresh;
+exports.start = async () => {
+  try {
+    const rabbitmqUrl = 'amqp://guest:guest@localhost:5672'; // Update with your RabbitMQ URL
+    const connection = await amqp.connect(rabbitmqUrl);
+    const channel = await connection.createChannel();
+    const exchangeName = 'batch';
+
+    await channel.assertExchange(exchangeName, 'fanout', { durable: false });
+    const { queue } = await channel.assertQueue('', { exclusive: true });
+    await channel.bindQueue(queue, exchangeName, '');
+
+    channel.consume(queue, async (message) => {
+      if (message.content) {
+        const data = JSON.parse(message.content.toString());
+        await handleBatchCacheRefresh(data.criteria);
+      }
+    }, { noAck: true });
+
+    logger.info('Batch cache refresh consumer started successfully.');
+  } catch (error) {
+    logger.error('Error starting batch cache refresh consumer:', error);
+    throw error;
+  }
+};

@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  node_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: my_node_app
+    container_name: my_node_app_container
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+      - rabbitmq
+    environment:
+      MONGO_URL: "mongodb://mongo:27017/cachedMechanism"
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
+    networks:
+      - my_network
+
+  mongo:
+    image: mongo:latest
+    container_name: my_mongo_container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - my_network
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: my_rabbitmq_container
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+
+volumes:
+  mongo_data:

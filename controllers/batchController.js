@@ -5,12 +5,11 @@ const simulateTimeConsumingTask = require('../utils/simulateTimeConsumingTask');
 exports.batchCacheRefresh = async (req, res) => {
   try {
     const { criteria } = req.body;
-    console.log(criteria);
     logger.info(`Batch cache refresh request received with criteria: ${JSON.stringify(criteria)}`);
-
     await queueController.sendMessage('batch', criteria);
     await simulateTimeConsumingTask();
 
+    
     logger.info('Batch cache refresh completed.');
     res.json({ message: 'Batch cache refresh completed successfully.' });
   } catch (err) {
