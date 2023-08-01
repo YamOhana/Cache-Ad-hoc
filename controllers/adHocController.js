@@ -4,7 +4,7 @@ const queueController = require('../queue/queueController');
 
 exports.adHocCacheRefresh = async (objectId, payload) => {
   try {
-    logger.info(`ADHOC CONTROLLER: Ad-hoc cache refresh request received for object ID: ${objectId}`);
+    logger.info(`Ad-hoc cache refresh request received for object ID: ${objectId}`);
     await queueController.sendMessage('adHoc', objectId, payload);
     await simulateTimeConsumingTask();
   } catch (err) {

@@ -9,11 +9,14 @@ const handleAdHocCacheRefresh = async (message, payload) => {
     // action example
     await CachedObject.findOneAndUpdate(
       { ID: message },
-      { lastUpdateDate: Date.now()},
-      { cachedData: payload, requestType: 'ad-hoc' },
+      {
+        lastUpdateDate: Date.now(),
+        URL: payload,
+        cachedData: payload,
+        requestType: 'ad-hoc'
+      },
       { upsert: true, new: true }
     );
-
     logger.info(`Ad-hoc cache refresh completed for object ID: ${message}`);
   } catch (error) {
     logger.error(`Error in ad-hoc cache refresh for object ID: ${message}`, error);
@@ -22,15 +25,14 @@ const handleAdHocCacheRefresh = async (message, payload) => {
 
 exports.start = async () => {
   try {
-    const rabbitmqUrl = process.env.RABBITMQ_URL; 
+    const rabbitmqUrl = process.env.RABBITMQ_URL_DEV;
     const connection = await amqp.connect(rabbitmqUrl);
     const channel = await connection.createChannel();
     const exchangeName = 'adHocExchange';
-
+    
     await channel.assertExchange(exchangeName, 'direct', { durable: true });
     const { queue } = await channel.assertQueue('adHocQueue');
     await channel.bindQueue(queue, exchangeName, '');
-
 
     channel.consume(queue, async (message) => {
       if (message.content) {

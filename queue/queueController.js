@@ -1,9 +1,6 @@
 const setupRabbitMQ = require('../config/rabbitmqConfig');
 const logger = require('../config/logger')
 
-
-
-
 let channel;
 
 const initializeChannel = async () => {
@@ -26,7 +23,7 @@ exports.sendMessage = async (queueType, message, payload) => {
 
     if (queueType === 'adHoc') {
       logger.info('Sending message to ad hoc channel')
-     
+
       const adHocExchangeName = 'adHocExchange';
       const adHocRoutingKey = 'adHocExchange';
       const adHocMessage = { message, payload };
@@ -35,7 +32,8 @@ exports.sendMessage = async (queueType, message, payload) => {
       logger.info('Message sent to ad-hoc exchange with routing key "adHoc"');
     } else if (queueType === 'batch') {
       const batchQueueName = 'batchQueue';
-      const batchMessageBuffer = Buffer.from(JSON.stringify(message));
+      const batchQueueMessage =  { message, payload };
+      const batchMessageBuffer = Buffer.from(JSON.stringify(batchQueueMessage));
       await channel.sendToQueue(batchQueueName, batchMessageBuffer, { persistent: true });
       console.log('Message sent to batch queue');
     } else {

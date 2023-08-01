@@ -10,9 +10,9 @@ const PORT = 3000;
 
 mongoose.connect(process.env.MONGO_URL_DEV
   , {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log('Connected to MongoDB locally'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 

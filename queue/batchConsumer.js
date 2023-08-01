@@ -4,13 +4,18 @@ const logger = require('../config/logger');
 
 const handleBatchCacheRefresh = async (criteria) => {
   try {
-    logger.info('Handling batch cache refresh with criteria:', criteria);
-
+    logger.info(`Handling batch cache refresh with criteria: ${criteria}`);
     // action example
-    const updatedData = `Sample updated cached data for batch requests at ${Date.now()}`;
-    await CachedObject.updateMany(criteria, { cachedData: updatedData, requestType: 'batch' });
+    const falseData = 'just some false updated data'
+    await CachedObject.updateMany(
+      criteria,
+      {
+        cachedData: falseData,
+        requestType: 'batch'
+      }
+    );
 
-    logger.info('Batch cache refresh completed with criteria:', criteria);
+    logger.info(`Batch cache refresh completed with criteria: ${criteria}`);
   } catch (error) {
     logger.error('Error in batch cache refresh:', error);
   }
@@ -18,7 +23,7 @@ const handleBatchCacheRefresh = async (criteria) => {
 
 exports.start = async () => {
   try {
-    const rabbitmqUrl = process.env.RABBITMQ_URL; 
+    const rabbitmqUrl = process.env.RABBITMQ_URL_DEV;
     const connection = await amqp.connect(rabbitmqUrl);
     const channel = await connection.createChannel();
     const exchangeName = 'batchQueue';
@@ -30,7 +35,7 @@ exports.start = async () => {
     channel.consume(queue, async (message) => {
       if (message.content) {
         const data = JSON.parse(message.content.toString());
-        await handleBatchCacheRefresh(data.criteria);
+        await handleBatchCacheRefresh(data.message);
       }
     }, { noAck: true });
 
