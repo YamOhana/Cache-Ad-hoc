@@ -9,6 +9,7 @@ const handleAdHocCacheRefresh = async (message, payload) => {
     // action example
     await CachedObject.findOneAndUpdate(
       { ID: message },
+      { lastUpdateDate: Date.now()},
       { cachedData: payload, requestType: 'ad-hoc' },
       { upsert: true, new: true }
     );
@@ -34,7 +35,6 @@ exports.start = async () => {
     channel.consume(queue, async (message) => {
       if (message.content) {
         const data = JSON.parse(message.content.toString());
-        console.log(data);
         await handleAdHocCacheRefresh(data.message, data.payload);
       }
     }, { noAck: true });

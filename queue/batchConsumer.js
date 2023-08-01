@@ -6,9 +6,8 @@ const handleBatchCacheRefresh = async (criteria) => {
   try {
     logger.info('Handling batch cache refresh with criteria:', criteria);
 
-    // Perform your batch cache refresh logic here...
     // action example
-    const updatedData = 'Sample updated cached data for batch';
+    const updatedData = `Sample updated cached data for batch requests at ${Date.now()}`;
     await CachedObject.updateMany(criteria, { cachedData: updatedData, requestType: 'batch' });
 
     logger.info('Batch cache refresh completed with criteria:', criteria);
@@ -25,7 +24,7 @@ exports.start = async () => {
     const exchangeName = 'batchQueue';
 
     await channel.assertExchange(exchangeName, 'fanout', { durable: false });
-    const { queue } = await channel.assertQueue('', { exclusive: true });
+    const { queue } = await channel.assertQueue(exchangeName, { durable: true });
     await channel.bindQueue(queue, exchangeName, '');
 
     channel.consume(queue, async (message) => {
