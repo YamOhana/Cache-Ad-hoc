@@ -28,7 +28,7 @@ exports.sendMessage = async (queueType, message, payload) => {
       logger.info('Sending message to ad hoc channel')
      
       const adHocExchangeName = 'adHocExchange';
-      const adHocRoutingKey = 'adHoc';
+      const adHocRoutingKey = 'adHocExchange';
       const adHocMessage = { message, payload };
       const adHocMessageBuffer = Buffer.from(JSON.stringify(adHocMessage));
       await channel.publish(adHocExchangeName, adHocRoutingKey, adHocMessageBuffer, { persistent: true });

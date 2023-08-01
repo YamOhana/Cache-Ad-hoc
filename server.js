@@ -8,7 +8,7 @@ const adHocConsumer = require('./queue/adHocConsumer.js');
 const batchConsumer = require('./queue/batchConsumer.js');
 const PORT = 3000;
 
-mongoose.connect(process.env.MONGO_URL_DEV
+mongoose.connect(process.env.MONGO_URL
   , {
   useNewUrlParser: true,
   useUnifiedTopology: true,

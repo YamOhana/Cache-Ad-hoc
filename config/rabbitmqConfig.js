@@ -5,7 +5,7 @@ const logger = require('./logger')
 const setupRabbitMQ = async () => {
     try {
         logger.info('Connecting to rabbit')
-        const connection = await amqp.connect(process.env.RABBITMQ_URL);
+        const connection = await amqp.connect(process.env.RABBITMQ_URL_DEV);
         const channel = await connection.createChannel();
 
         logger.info('Declair exchange');
@@ -17,7 +17,7 @@ const setupRabbitMQ = async () => {
 
         const adHocQueueName = 'adHocQueue';
         await channel.assertQueue(adHocQueueName, { durable: true });
-        await channel.bindQueue(adHocQueueName, adHocExchangeName, 'adHoc');
+        await channel.bindQueue(adHocQueueName, adHocExchangeName, 'adHocExchange');
 
         logger.info('Declair batchQueue');
 

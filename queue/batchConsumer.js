@@ -19,10 +19,10 @@ const handleBatchCacheRefresh = async (criteria) => {
 
 exports.start = async () => {
   try {
-    const rabbitmqUrl = process.env.RABBITMQ_URL; 
+    const rabbitmqUrl = process.env.RABBITMQ_URL_DEV; 
     const connection = await amqp.connect(rabbitmqUrl);
     const channel = await connection.createChannel();
-    const exchangeName = 'batch';
+    const exchangeName = 'batchQueue';
 
     await channel.assertExchange(exchangeName, 'fanout', { durable: false });
     const { queue } = await channel.assertQueue('', { exclusive: true });
