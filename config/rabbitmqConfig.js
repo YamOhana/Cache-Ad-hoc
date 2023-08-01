@@ -5,7 +5,7 @@ const logger = require('./logger')
 const setupRabbitMQ = async () => {
     try {
         logger.info('Connecting to rabbit')
-        const connection = await amqp.connect(process.env.RABBITMQ_URL_DEV);
+        const connection = await amqp.connect(process.env.RABBITMQ_URL);
         const channel = await connection.createChannel();
 
         logger.info('Declair exchange');
