@@ -31,6 +31,7 @@ exports.start = async () => {
     await channel.bindQueue(queue, exchangeName, '');
 
     channel.consume(queue, async (message) => {
+      console.log(message);
       if (message.content) {
         const data = JSON.parse(message.content.toString());
         await handleAdHocCacheRefresh(data.objectId);

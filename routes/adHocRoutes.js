@@ -7,11 +7,10 @@ const router = express.Router();
 router.post('/refresh/:objectId', async (req, res) => {
   try {
     const { objectId } = req.params;
+    const payload = req.body.URL;
 
+    await adHocController.adHocCacheRefresh(objectId, payload);
 
-    await adHocController.adHocCacheRefresh(objectId);
-
-    logger.info(`Ad-hoc cache refresh completed for object ID: ${ objectId }` );
 
     res.json({ message: 'Ad-hoc cache refresh completed successfully.' });
   } catch (err) {

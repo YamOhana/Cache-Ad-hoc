@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const routes = require('./routes');
 const logger = require('./config/logger');
-
-
 const adHocConsumer = require('./queue/adHocConsumer.js');
 const batchConsumer = require('./queue/batchConsumer.js');
-mongoose.connect(process.env.MONGO_URL
+const PORT = 3000;
+
+mongoose.connect(process.env.MONGO_URL_DEV
   , {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -17,7 +17,8 @@ mongoose.connect(process.env.MONGO_URL
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
 const app = express();
-(async () => {
+const startConsumers = async () => {
+  logger.info('connecting to rabbit')
   try {
     await adHocConsumer.start();
     await batchConsumer.start();
@@ -25,7 +26,8 @@ const app = express();
   } catch (error) {
     logger.error('Error starting consumers:', error);
   }
-})();
+}
+setTimeout(startConsumers, 10000);
 
 app.use(bodyParser.json());
 app.use('/api', routes);
@@ -35,7 +37,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: 'Internal Server Error' });
 });
 
-const PORT = 3000;
 
 app.listen(PORT, () => {
   logger.info(`Server is running on port ${PORT}`);

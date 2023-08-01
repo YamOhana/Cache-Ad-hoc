@@ -1,12 +1,11 @@
 const amqp = require('amqplib');
-const rabbitmqUrl = process.env.RABBITMQ_URL;
 const logger = require('./logger')
 
 
 const setupRabbitMQ = async () => {
     try {
-        const connection = await amqp.connect(rabbitmqUrl);
         logger.info('Connecting to rabbit')
+        const connection = await amqp.connect(process.env.RABBITMQ_URL);
         const channel = await connection.createChannel();
 
         logger.info('Declair exchange');
@@ -24,9 +23,10 @@ const setupRabbitMQ = async () => {
 
         const batchQueueName = 'batchQueue';
         await channel.assertQueue(batchQueueName, { durable: true });
-        return channel;
+        return { connection, channel };
     } catch (error) {
-        console.error('Error setting up RabbitMQ:', error);
+        logger.error(`Error setting up RabbitMQ: ${error}`);
+        throw error;
     }
 };
 

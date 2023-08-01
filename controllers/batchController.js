@@ -8,9 +8,6 @@ exports.batchCacheRefresh = async (req, res) => {
     logger.info(`Batch cache refresh request received with criteria: ${JSON.stringify(criteria)}`);
     await queueController.sendMessage('batch', criteria);
     await simulateTimeConsumingTask();
-
-    
-    logger.info('Batch cache refresh completed.');
     res.json({ message: 'Batch cache refresh completed successfully.' });
   } catch (err) {
     logger.error(`Error in batchCacheRefresh: ${err}`);
