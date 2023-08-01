@@ -21,7 +21,7 @@ const handleAdHocCacheRefresh = async (objectId) => {
 
 exports.start = async () => {
   try {
-    const rabbitmqUrl = 'amqp://guest:guest@localhost:5672'; 
+    const rabbitmqUrl = process.env.RABBITMQ_URL; 
     const connection = await amqp.connect(rabbitmqUrl);
     const channel = await connection.createChannel();
     const exchangeName = 'adHoc';

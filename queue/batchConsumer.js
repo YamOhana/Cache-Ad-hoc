@@ -19,7 +19,7 @@ const handleBatchCacheRefresh = async (criteria) => {
 
 exports.start = async () => {
   try {
-    const rabbitmqUrl = 'amqp://guest:guest@localhost:5672'; // Update with your RabbitMQ URL
+    const rabbitmqUrl = process.env.RABBITMQ_URL; // Update with your RabbitMQ URL
     const connection = await amqp.connect(rabbitmqUrl);
     const channel = await connection.createChannel();
     const exchangeName = 'batch';
