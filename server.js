@@ -8,7 +8,7 @@ const adHocConsumer = require('./queue/adHocConsumer.js');
 const batchConsumer = require('./queue/batchConsumer.js');
 const PORT = 3000;
 
-mongoose.connect(process.env.MONGO_URL_DEV
+mongoose.connect(process.env.MONGO_URL
   , {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -27,7 +27,7 @@ const startConsumers = async () => {
     logger.error('Error starting consumers:', error);
   }
 }
-setTimeout(startConsumers, 10000);
+setTimeout(startConsumers, 5000);
 
 app.use(bodyParser.json());
 app.use('/api', routes);
