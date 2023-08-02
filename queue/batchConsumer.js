@@ -4,7 +4,7 @@ const logger = require('../config/logger');
 
 const handleBatchCacheRefresh = async (criteria) => {
   try {
-    logger.info(`Handling batch cache refresh with criteria: ${criteria}`);
+    logger.info(`Handling batch cache refresh with criteria: ${JSON.stringify(criteria)}`);
     // action example
     const falseData = 'just some false updated data'
     await CachedObject.updateMany(
